@@ -1,0 +1,14 @@
+#content{
+	text-align: center;
+}
+
+.auth-form{
+	display: inline-block;
+	max-width: 300px;
+}
+
+.subauth-button{
+	font-weight: bold;
+/* 	background: rgba(255, 255, 255, .1); */
+/* 	padding: 3px 5px; */
+}
