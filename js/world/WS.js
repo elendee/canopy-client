@@ -66,6 +66,7 @@ const init = () => {
 			return false
 		}
 
+		if( env.DEV || env.LOCAL ) hal('standard', 'ws: ' + packet.type, 500 )
 
 		switch( packet.type ){
 
