@@ -72,12 +72,12 @@ const init = () => {
 			// ALL
 
 			case 'init_entry':
-				BROKER.publish('SYSTEM_INIT', packet )
+				BROKER.publish('CANOPY_INIT', packet )
 				bound = 1
 				break;
 
 			case 'move_tick':
-				BROKER.publish('SYSTEM_MOVE_TICK', packet )
+				BROKER.publish('CANOPY_MOVE_TICK', packet )
 				break;
 
 			case 'chat':

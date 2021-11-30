@@ -1,6 +1,7 @@
-#world-canvas{
-    border: 2px solid green;
+#canopy-canvas{
+    border: 3px solid lightblue;
     position: fixed;
+    z-index: 99;
     top: 0;
     left: 0;
     width: 100%;
