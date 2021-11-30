@@ -76,6 +76,10 @@ const init = () => {
 				bound = 1
 				break;
 
+			case 'pong_tiles':
+				BROKER.publish('PONG_TILES', packet )
+				break;
+
 			case 'move_tick':
 				BROKER.publish('CANOPY_MOVE_TICK', packet )
 				break;

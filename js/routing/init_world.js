@@ -4,8 +4,6 @@ import menu from '../world/ui/menu.js'
 
 import CANOPY from '../world/CANOPY.js'
 
-// import jaman from '../world/jaman.js'
-
 
 
 menu()
