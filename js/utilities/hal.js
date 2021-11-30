@@ -21,9 +21,9 @@ const style = `
 	bottom: 100px;
 	right: 30px;
 	text-align: right;
-	width: 70%;
 	pointer-events: none;
 	padding-top: 10px;
+	max-width: 80%;
 }
 .alert-wrap{
 	transition: .5s;
@@ -37,6 +37,9 @@ const style = `
 	margin: 1px 0;
 	padding: 3px 40px 3px 20px;
     pointer-events: initial;
+	overflow-x: auto;
+	max-width: 100%;
+
 }
 .alert-msg pre{
 	max-height: 80vh;
