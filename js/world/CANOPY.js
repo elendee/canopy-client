@@ -1,6 +1,7 @@
 import BROKER from '../utilities/EventBroker.js'
 import hal from '../utilities/hal.js'
 import jam from './jaman.js'
+import Hydration from '../utilities/Hydration.js'
 
 import {
 	sleep,
@@ -22,7 +23,10 @@ const init = async( event ) => {
 	hal('success', 'seeding canopy:  ' + canopy.name, 5 * 1000 )
 	await sleep( 1000 )
 
-	hal('standard', '<pre style="text-align: left">' + JSON.stringify(canopy, false, 2 ) + '</pre>')
+	const c = new Hydration( canopy )
+
+
+	hal('standard', '<pre style="text-align: left">' + JSON.stringify( c.publish(), false, 2 ) + '</pre>')
 
 	jam( canopy )
 
