@@ -46,7 +46,7 @@ const init = () => {
 
 			SOCKET.bad_messages++
 			if( SOCKET.bad_messages > 100 ) {
-				console.log('100+ faulty socket messages', msg )
+				console.log('100+ faulty socket messages detected', msg )
 				SOCKET.bad_messages = 0
 			}
 			console.log('failed to parse server msg: ', msg )
@@ -54,58 +54,13 @@ const init = () => {
 
 		}
 
-		// if( 0 && env.LOCAL && !env.LOG_WS_RECEIVE_EXCLUDES.includes( packet.type ) ) console.log( packet )
-
-		// if( bound !== 1 && packet.type !== 'private_init_world' ){
-		// 	if( bound === 0 ){
-		// 		bound = 'limbo'
-		// 		if( packet.msg && packet.msg.match(/failed to find/)){
-		// 			hal('error', packet.msg, 5000)
-		// 		}
-		// 		if( packet.type === 'hal' ){
-		// 			hal( packet.msg_type, packet.msg, packet.time )
-		// 		}
-		// 		console.log('user not yet intialized.. packet: ', packet )
-		// 	}else{
-		// 		// limbo, nothing
-		// 	}
-		// 	return false
-		// }
-
-		// if( env.DEV || env.LOCAL ) hal('standard', 'ws: ' + packet.type, 500 )
-
 		if( window.ROUTER ){
 			ROUTER( packet )
 		}else{
 			console.log('router not found for packet: ', packet )
 		}
-
-		// switch( packet.type ){
-
-		// 	// ALL
-
-		// 	case 'private_init_world':
-		// 		BROKER.publish('CANOPY_INIT', packet )
-		// 		bound = 1
-		// 		break;
-
-		// 	case 'pong_tiles':
-		// 		BROKER.publish('PONG_TILES', packet )
-		// 		break;
-
-		// 	case 'move_tick':
-		// 		BROKER.publish('CANOPY_MOVE_TICK', packet )
-		// 		break;
-
-		// 	case 'chat':
-		// 		BROKER.publish('RESOLVE_CHAT', packet )
-		// 		break;
-
-		// 	default: break
-		// }
-
+		
 	}
-
 
 
 
