@@ -8,88 +8,183 @@ import CONTROLS from './ui/CONTROLS.js'
 
 
 
+let users = {};
+
+
+
+// const MOVE_SPEED = 1;
+let PIXEL_SIZE = 10;
+let CANVAS_W = 64 * PIXEL_SIZE;
+let CANVAS_H = 128 * PIXEL_SIZE;
+// let GAME_W = 800;
+// let GAME_H = 600;
+const FLOOR_COLOR = "#cccccc";
+const WALL_COLOR = "#333333";
+const HERO_COLOR = "#eeff33";
+
+
+const colors = [
+    'transparent',
+    'rgb(99,199,77)',
+    'rgb(38,92,66)',
+    'rgb(25,60,62)',
+    'rgb(115,62,57)',
+    'rgb(181,80,136)',
+    'rgb(104,56,108)',
+    'rgb(18,78,137)',
+    
+    'rgb(190,74,47)',
+    'rgb(24,20,37)',
+    'rgb(90,105,136)',
+    'rgb(255,255,255)',
+    'rgb(139,155,180)',
+    'rgb(162,38,51)',
+    'rgb(246,117,122)',
+    'rgb(254,231,97)',
+    'rgb(234,212,170)',
+    'rgb(194,133,105)',
+    'rgb(232,183,150)'
+];
+const wallColors = {
+    'rgb(99,199,77)': 1,
+    'rgb(38,92,66)': 1,
+    'rgb(25,60,62)': 1,
+    'rgb(115,62,57)': 1,
+    'rgb(181,80,136)': 1,
+    'rgb(104,56,108)': 1,
+    'rgb(18,78,137)': 1
+};
+
+let GRAVITY = 0.09;
+
+
+
+
+function emitAction(type) {
+    if(!users.user || !users.user.id){
+        return;
+    }
+    const time = Date.now();
+    socket.emit('action', {
+        id: users.user.id,
+        type: type,
+        actionTime: time,
+        prevActionTime: HERO_MESH.userData.prevActionTime,
+        vx: HERO_MESH.userData.vx,//unused
+        vy: HERO_MESH.userData.vy,//unused
+        tx: HERO_MESH.userData.tx,//unused
+        ty: HERO_MESH.userData.ty,//unused
+        x: HERO_MESH.userData.x,
+        y: HERO_MESH.userData.y
+    });
+    HERO_MESH.userData.prevActionTime = time;
+}
+
+
+
+function animate() {
+    playerupdate();
+    requestAnimationFrame( animate );
+    RENDERER.render( SCENE, CAMERA );
+    CONTROLS.update();
+    WORLD_GROUP.position.set(
+        -(HERO_MESH.userData.x / PIXEL_SIZE),
+        -(CANVAS_H/PIXEL_SIZE)+(HERO_MESH.userData.y / PIXEL_SIZE)-0.1,
+        -1,
+    );
+    Object.keys(users).forEach(uid=>{
+        const user = users[uid];
+        
+        // console.log('user === ',user);
+    })
+}
+
+
+const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+const material = new THREE.MeshBasicMaterial({ color: HERO_COLOR });
+const HERO_MESH = new THREE.Mesh( geometry, material );
+
+const WORLD_GROUP = new THREE.Group();
+
+
+
+function getTileMaterials(tileDataArr,idxArr) {
+    
+    return idxArr.map(i=>{
+        const canvas = document.createElement('canvas');
+        const scaledImageData = scaleImageData(tileDataArr[i], 8);
+        const w = canvas.width = scaledImageData.width;
+        const h = canvas.height = scaledImageData.height;
+        const ctx = canvas.getContext('2d');
+        ctx.putImageData(scaledImageData, 0, 0);
+        return new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(canvas)});
+    })
+}
+
+
+
+
+
+
+
+
+const keyboard = {
+    _pressed: {},
+    LEFT: 37,
+    UP: 38,
+    RIGHT: 39,
+    DOWN: 40,
+    KEYBOARD_W: 87,
+    KEYBOARD_A: 65,
+    KEYBOARD_S: 83,
+    KEYBOARD_D: 68,
+    KEYBOARD_SPACE: 32,
+    LEFT_STICK: "L_STICK",
+    UP_STICK: "U_STICK",
+    RIGHT_STICK: "R_STICK",
+    DOWN_STICK: "D_STICK",
+    LEFT_PAD: "L_PAD",
+    UP_PAD: "U_PAD",
+    RIGHT_PAD: "R_PAD",
+    DOWN_PAD: "D_PAD",
+    isDown: function (keyCode) {
+        return this._pressed[keyCode];
+    },
+    onKeydown: function (event) {
+        console.log('event === ',event);
+        this._pressed[event.keyCode] = true;
+    },
+    onKeyup: function (event) {
+        delete this._pressed[event.keyCode];
+    }
+};
+
+
+
+
+
+window.addEventListener('gamepadconnected', (e) => {
+    console.log("Gamepad connected");
+    window.HERO_GAMEPAD_IDX = e.gamepad.index;
+    console.log('window.HERO_GAMEPAD_IDX === ',window.HERO_GAMEPAD_IDX);
+});
+
+
+
+
+
+
+
+
+
+
 
 
 const jam = canopy => {
 
-	console.log('initial canopy data for player: ', canopy )
-
-	return 
-
-
-
-	
-
 	const map_img = document.createElement('img')
 	map_img.src = '/resource/media/textures/terraria_test2.png'
 
-
-	let users = {};
-
-	function emitAction(type) {
-	    if(!users.user || !users.user.id){
-	        return;
-	    }
-	    const time = Date.now();
-	    socket.emit('action', {
-	        id: users.user.id,
-	        type: type,
-	        actionTime: time,
-	        prevActionTime: HERO_MESH.userData.prevActionTime,
-	        vx: HERO_MESH.userData.vx,//unused
-	        vy: HERO_MESH.userData.vy,//unused
-	        tx: HERO_MESH.userData.tx,//unused
-	        ty: HERO_MESH.userData.ty,//unused
-	        x: HERO_MESH.userData.x,
-	        y: HERO_MESH.userData.y
-	    });
-	    HERO_MESH.userData.prevActionTime = time;
-	}
-
-	// const MOVE_SPEED = 1;
-	let PIXEL_SIZE = 10;
-	let CANVAS_W = 64 * PIXEL_SIZE;
-	let CANVAS_H = 128 * PIXEL_SIZE;
-	// let GAME_W = 800;
-	// let GAME_H = 600;
-	const FLOOR_COLOR = "#cccccc";
-	const WALL_COLOR = "#333333";
-	const HERO_COLOR = "#eeff33";
-
-
-	const colors = [
-	    'transparent',
-	    'rgb(99,199,77)',
-	    'rgb(38,92,66)',
-	    'rgb(25,60,62)',
-	    'rgb(115,62,57)',
-	    'rgb(181,80,136)',
-	    'rgb(104,56,108)',
-	    'rgb(18,78,137)',
-	    
-	    'rgb(190,74,47)',
-	    'rgb(24,20,37)',
-	    'rgb(90,105,136)',
-	    'rgb(255,255,255)',
-	    'rgb(139,155,180)',
-	    'rgb(162,38,51)',
-	    'rgb(246,117,122)',
-	    'rgb(254,231,97)',
-	    'rgb(234,212,170)',
-	    'rgb(194,133,105)',
-	    'rgb(232,183,150)'
-	];
-	const wallColors = {
-	    'rgb(99,199,77)': 1,
-	    'rgb(38,92,66)': 1,
-	    'rgb(25,60,62)': 1,
-	    'rgb(115,62,57)': 1,
-	    'rgb(181,80,136)': 1,
-	    'rgb(104,56,108)': 1,
-	    'rgb(18,78,137)': 1
-	};
-
-	let GRAVITY = 0.09;
 
 	// const camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 1000 );
 	// const renderer = new THREE.WebGLRenderer();
@@ -103,14 +198,9 @@ const jam = canopy => {
 	CAMERA.position.y = 0;
 	CAMERA.position.z = 18;
 
-
-
-	const WORLD_GROUP = new THREE.Group();
 	SCENE.add(WORLD_GROUP);
 
-	const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-	const material = new THREE.MeshBasicMaterial({ color: HERO_COLOR });
-	const HERO_MESH = new THREE.Mesh( geometry, material );
+
 	// HERO_MESH.userData.x = (CANVAS_W/2) - 90;
 	// HERO_MESH.userData.y = CANVAS_H - (CANVAS_H/8) + 50;
 	HERO_MESH.userData.x = (CANVAS_W/2) - 30;
@@ -146,175 +236,107 @@ const jam = canopy => {
 
 
 
-	function animate() {
-	    playerupdate();
-	    requestAnimationFrame( animate );
-	    RENDERER.render( SCENE, CAMERA );
-	    CONTROLS.update();
-	    WORLD_GROUP.position.set(
-	        -(HERO_MESH.userData.x / PIXEL_SIZE),
-	        -(CANVAS_H/PIXEL_SIZE)+(HERO_MESH.userData.y / PIXEL_SIZE)-0.1,
-	        -1,
-	    );
-	    Object.keys(users).forEach(uid=>{
-	        const user = users[uid];
-	        
-	        // console.log('user === ',user);
-	    })
-	}
-	window.onload = () => {
+	
+	// window.onload = () => {
 
-	    canvas.width = CANVAS_W;
-	    canvas.height = CANVAS_H;
-	    ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
-	    ctx.fillStyle = WALL_COLOR;
+    canvas.width = CANVAS_W;
+    canvas.height = CANVAS_H;
+    ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+    ctx.fillStyle = WALL_COLOR;
 
-	    collisionCanvas.width = CANVAS_W;
-	    collisionCanvas.height = CANVAS_H;
+    collisionCanvas.width = CANVAS_W;
+    collisionCanvas.height = CANVAS_H;
 
-	    heroCanvas.width = CANVAS_W;
-	    heroCanvas.height = CANVAS_H;
-	    heroCtx.fillStyle = "yellow";
-	    heroCtx.fillRect(HERO_MESH.userData.x, HERO_MESH.userData.y, PIXEL_SIZE, PIXEL_SIZE);
-	    ctx.drawImage(heroCanvas, 0, 0);
-	    const colorZ = {
-	        'rgb(99,199,77)': 1,
-	        'rgb(38,92,66)': 1,
-	        'rgb(25,60,62)': 1,
-	        'rgb(115,62,57)': 1,
-	        'rgb(104,56,108)': 1,
-	        'rgb(190,74,47)': 1,
-	        'rgb(24,20,37)': 1,
-	        'rgb(255,255,255)': 1,
-	        'rgb(139,155,180)': 1,
-	        'rgb(162,38,51)': 1,
-	        'rgb(246,117,122)': 1,
-	        
-	        'rgb(90,105,136)': 0,
-	        'rgb(181,80,136)': 0,
-	        'rgb(18,78,137)': 0,
-	        'rgb(254,231,97)': 0,
-	        'rgb(234,212,170)': 0,
-	        'rgb(194,133,105)': 0,
-	        'rgb(232,183,150)': 0
-	    };
-	    const colorArr = Object.keys(colorZ);
-	    const zArr = colorArr.map(k=>colorZ[k]);
-	    const rgbArr = colorArr.map(n=>n.split("(")[1].replace(")","").split(",").map(Number));
+    heroCanvas.width = CANVAS_W;
+    heroCanvas.height = CANVAS_H;
+    heroCtx.fillStyle = "yellow";
+    heroCtx.fillRect(HERO_MESH.userData.x, HERO_MESH.userData.y, PIXEL_SIZE, PIXEL_SIZE);
+    ctx.drawImage(heroCanvas, 0, 0);
+    const colorZ = {
+        'rgb(99,199,77)': 1,
+        'rgb(38,92,66)': 1,
+        'rgb(25,60,62)': 1,
+        'rgb(115,62,57)': 1,
+        'rgb(104,56,108)': 1,
+        'rgb(190,74,47)': 1,
+        'rgb(24,20,37)': 1,
+        'rgb(255,255,255)': 1,
+        'rgb(139,155,180)': 1,
+        'rgb(162,38,51)': 1,
+        'rgb(246,117,122)': 1,
+        
+        'rgb(90,105,136)': 0,
+        'rgb(181,80,136)': 0,
+        'rgb(18,78,137)': 0,
+        'rgb(254,231,97)': 0,
+        'rgb(234,212,170)': 0,
+        'rgb(194,133,105)': 0,
+        'rgb(232,183,150)': 0
+    };
+    const colorArr = Object.keys(colorZ);
+    const zArr = colorArr.map(k=>colorZ[k]);
+    const rgbArr = colorArr.map(n=>n.split("(")[1].replace(")","").split(",").map(Number));
 
-	    drawWalls(map_img, wallColors);
+    drawWalls(map_img, wallColors);
 
-	    const mapImageData = imageToImageData(map_img);
-	    console.log('mapImageData === ',mapImageData);
-	    const COLORS = colorArr.map(c=>new THREE.Color(c));
-	    console.log('COLORS === ',COLORS);
-	    const plen = COLORS.length;
-	    const geometry = new THREE.BoxGeometry(1, 1, 1);
-	    // const material = new THREE.MeshBasicMaterial({color:"#999"});
-	    const material = new THREE.MeshBasicMaterial();
-	    const instancedMesh = new THREE.InstancedMesh(
-	        geometry,
-	        material,
-	        mapImageData.data.length/4
-	    );
-	    const temp = new THREE.Object3D();
-	    const colorIdxCache = {};
-	    const zCache = {};
-	    const w = mapImageData.width;
-	    const h = mapImageData.height;
-	    for(let i = 0; i < mapImageData.data.length;i+=4) {
-	        let _i = i/4;
-	        const x = _i%w;
-	        const y = h - Math.floor(_i/w);
-	        const r = mapImageData.data[i];
-	        if(!colorIdxCache[r]){
-	            let idx = 0;
-	            for(let rgbIdx = 0; rgbIdx < rgbArr.length;rgbIdx++) {
-	                const v = rgbArr[rgbIdx][0];
-	                if(r === rgbArr[rgbIdx][0]){
-	                    colorIdxCache[r] = COLORS[rgbIdx];
-	                    zCache[r] = rgbIdx;
-	                    break;
-	                }
-	            }
-	            COLORS.find(c=>{
-	                const n = Math.floor(c.r*255);
-	                // console.log('n === ',n, r);
-	                return n > (r-25) && n < (r+5)
-	            });
-	        }
-	        const z = zArr[zCache[r]];
-	        temp.position.x = x;
-	        temp.position.y = y;
-	        temp.position.z = z;
-	        temp.updateMatrix();
-	        instancedMesh.setMatrixAt(_i, temp.matrix);
-	        instancedMesh.setColorAt(_i, colorIdxCache[r]);
-	    }
-	    instancedMesh.instanceMatrix.needsUpdate = true;
-	    instancedMesh.instanceColor.needsUpdate = true;
-	    WORLD_GROUP.add(instancedMesh);
-	    // WORLD_GROUP.position.x = (CANVAS_W / PIXEL_SIZE)/2;
-	    // WORLD_GROUP.position.z = (CANVAS_H / PIXEL_SIZE)/2;
+    const mapImageData = imageToImageData(map_img);
+    console.log('mapImageData === ',mapImageData);
+    const COLORS = colorArr.map(c=>new THREE.Color(c));
+    console.log('COLORS === ',COLORS);
+    const plen = COLORS.length;
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    // const material = new THREE.MeshBasicMaterial({color:"#999"});
+    const material = new THREE.MeshBasicMaterial();
+    const instancedMesh = new THREE.InstancedMesh(
+        geometry,
+        material,
+        mapImageData.data.length/4
+    );
+    const temp = new THREE.Object3D();
+    const colorIdxCache = {};
+    const zCache = {};
+    const w = mapImageData.width;
+    const h = mapImageData.height;
+    for(let i = 0; i < mapImageData.data.length;i+=4) {
+        let _i = i/4;
+        const x = _i%w;
+        const y = h - Math.floor(_i/w);
+        const r = mapImageData.data[i];
+        if(!colorIdxCache[r]){
+            let idx = 0;
+            for(let rgbIdx = 0; rgbIdx < rgbArr.length;rgbIdx++) {
+                const v = rgbArr[rgbIdx][0];
+                if(r === rgbArr[rgbIdx][0]){
+                    colorIdxCache[r] = COLORS[rgbIdx];
+                    zCache[r] = rgbIdx;
+                    break;
+                }
+            }
+            COLORS.find(c=>{
+                const n = Math.floor(c.r*255);
+                // console.log('n === ',n, r);
+                return n > (r-25) && n < (r+5)
+            });
+        }
+        const z = zArr[zCache[r]];
+        temp.position.x = x;
+        temp.position.y = y;
+        temp.position.z = z;
+        temp.updateMatrix();
+        instancedMesh.setMatrixAt(_i, temp.matrix);
+        instancedMesh.setColorAt(_i, colorIdxCache[r]);
+    }
+    instancedMesh.instanceMatrix.needsUpdate = true;
+    instancedMesh.instanceColor.needsUpdate = true;
+    WORLD_GROUP.add(instancedMesh);
+    // WORLD_GROUP.position.x = (CANVAS_W / PIXEL_SIZE)/2;
+    // WORLD_GROUP.position.z = (CANVAS_H / PIXEL_SIZE)/2;
 
-	    animate();
-	}
-	function getTileMaterials(tileDataArr,idxArr) {
-	    
-	    return idxArr.map(i=>{
-	        const canvas = document.createElement('canvas');
-	        const scaledImageData = scaleImageData(tileDataArr[i], 8);
-	        const w = canvas.width = scaledImageData.width;
-	        const h = canvas.height = scaledImageData.height;
-	        const ctx = canvas.getContext('2d');
-	        ctx.putImageData(scaledImageData, 0, 0);
-	        return new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(canvas)});
-	    })
-	}
+    animate();
+	// }
 
 
 
-
-
-
-
-
-	const keyboard = {
-	    _pressed: {},
-	    LEFT: 37,
-	    UP: 38,
-	    RIGHT: 39,
-	    DOWN: 40,
-	    KEYBOARD_W: 87,
-	    KEYBOARD_A: 65,
-	    KEYBOARD_S: 83,
-	    KEYBOARD_D: 68,
-	    KEYBOARD_SPACE: 32,
-	    LEFT_STICK: "L_STICK",
-	    UP_STICK: "U_STICK",
-	    RIGHT_STICK: "R_STICK",
-	    DOWN_STICK: "D_STICK",
-	    LEFT_PAD: "L_PAD",
-	    UP_PAD: "U_PAD",
-	    RIGHT_PAD: "R_PAD",
-	    DOWN_PAD: "D_PAD",
-	    isDown: function (keyCode) {
-	        return this._pressed[keyCode];
-	    },
-	    onKeydown: function (event) {
-	        console.log('event === ',event);
-	        this._pressed[event.keyCode] = true;
-	    },
-	    onKeyup: function (event) {
-	        delete this._pressed[event.keyCode];
-	    }
-	};
-
-	window.addEventListener('gamepadconnected', (e) => {
-	    console.log("Gamepad connected");
-	    window.HERO_GAMEPAD_IDX = e.gamepad.index;
-	    console.log('window.HERO_GAMEPAD_IDX === ',window.HERO_GAMEPAD_IDX);
-	});
 
 	setInterval(() => {
 	    window.HERO_GAMEPAD = navigator.getGamepads()[window.HERO_GAMEPAD_IDX];

@@ -39,6 +39,7 @@ const style = `
     pointer-events: initial;
 	overflow-x: auto;
 	max-width: 100%;
+	text-align: left;
 
 }
 .alert-msg pre{
