@@ -144,7 +144,8 @@ const hal = ( type, msg, time ) => {
 	
 }
 
-if( env.EXPOSE ) window.hal = hal
+// if( env.EXPOSE ) 
+	window.hal = hal
 
 
 export default hal
