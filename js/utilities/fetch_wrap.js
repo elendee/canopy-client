@@ -1,4 +1,4 @@
-import Spinner from './spinner.js'  
+import Spinner from './Spinner.js'  
 
 /* 
 fetch_wrap

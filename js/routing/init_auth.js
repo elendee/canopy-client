@@ -1,7 +1,7 @@
 import hal from '../utilities/hal.js'
 import { Modal } from '../utilities/Modal.js'
 import fetch_wrap from '../utilities/fetch_wrap.js'
-import Spinner from '../utilities/spinner.js'
+import Spinner from '../utilities/Spinner.js'
 
 const spinner = new Spinner({
 	src: '/resource/media/spinner.gif',

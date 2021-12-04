@@ -1,5 +1,5 @@
-import Spinner from '../utilities/spinner.js'
-import fetch_wrap from '../utilities/spinner.js'
+import Spinner from '../utilities/Spinner.js'
+import fetch_wrap from '../utilities/Spinner.js'
 import hal from '../utilities/hal.js'
 
 const spinner = new Spinner({

@@ -1,7 +1,7 @@
 
 import env from '../env.js'
 import hal from '../utilities/hal.js'
-import Spinner from '../utilities/spinner.js'
+import Spinner from '../utilities/Spinner.js'
 
 import BROKER from '../utilities/EventBroker.js'
 
@@ -11,7 +11,7 @@ const spinner = new Spinner({
 
 if( env.HASHA && env.HASHA === env.HASHB ){ // usually ROUTER will be a global from another script....
 	window.ROUTER = packet => {
-		hal('standard', '<pre>packet:<br>' + JSON.stringify( packet, false, 2 ) + '</pre>', 1000 )
+		hal('standard', '<pre>packet:<br>' + JSON.stringify( packet, false, 2 ) + '</pre>', 500 )
 		// console.log('packet: ', packet )
 	}
 }
@@ -23,7 +23,7 @@ const init = () => {
 
 	spinner.show()
 
-	SOCKET = new WebSocket( env.WS_URL )
+	SOCKET = window.SOCKET = new WebSocket( env.WS_URL )
 
 	SOCKET.onopen = function( event ){
 

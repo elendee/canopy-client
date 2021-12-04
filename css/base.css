@@ -259,6 +259,13 @@ body.index #content{
     padding: 3px 10px;
 }
 
+.script-upload{
+	max-width: 300px;
+	border: 1px solid #403f3f;
+	padding: 10px;
+	margin: 10px;
+}
+
 @keyframes link_pulse {
 	90% { opacity: .8 }
 	100% { opacity: 1 }
