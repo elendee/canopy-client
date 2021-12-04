@@ -57,6 +57,24 @@ const init = () => {
 		if( window.ROUTER ){
 			ROUTER( packet )
 		}
+
+
+				// console.log( packet )
+
+		switch( packet.type ){
+			case 'private_init_world':
+				window.PLAYER1 = packet.player1
+				// console.log( packet )
+				break;
+
+			case 'step':
+
+				break;
+
+			default: 
+				break;
+		}
+
 		// else{
 		// 	hal('packet', '<pre>' + JSON.stringify( packet, null, 2 ) + '</pre>')
 		// 	// console.log('router not found for packet: ', packet )
