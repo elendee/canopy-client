@@ -11,7 +11,7 @@ const spinner = new Spinner({
 
 if( env.HASHA && env.HASHA === env.HASHB ){ // usually ROUTER will be a global from another script....
 	window.ROUTER = packet => {
-		hal('standard', '<pre>packet:<br>' + JSON.stringify( packet, false, 2 ) + '</pre>', 500 )
+		hal('packet', '<pre>' + JSON.stringify( packet, false, 2 ) + '</pre>', 500 )
 		// console.log('packet: ', packet )
 	}
 }
@@ -56,9 +56,11 @@ const init = () => {
 
 		if( window.ROUTER ){
 			ROUTER( packet )
-		}else{
-			console.log('router not found for packet: ', packet )
 		}
+		// else{
+		// 	hal('packet', '<pre>' + JSON.stringify( packet, null, 2 ) + '</pre>')
+		// 	// console.log('router not found for packet: ', packet )
+		// }
 		
 	}
 
