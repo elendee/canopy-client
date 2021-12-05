@@ -2,6 +2,11 @@
 import env from '../env.js'
 import hal from '../utilities/hal.js'
 import Spinner from '../utilities/Spinner.js'
+import {
+	event_watch,
+	refresh_events,
+} from '../utilities/event_watch.js'
+
 
 import BROKER from '../utilities/EventBroker.js'
 
@@ -60,10 +65,7 @@ const init = () => {
 
 		refresh_events( packet )
 
-		if( logging_events.includes( packet.type )){
-			hal('packet', '<pre>' + JSON.stringify( packet, false, 2 ) + '</pre>', 500 )
-			console.log( packet )
-		}
+		event_watch( packet )
 
 		switch( packet.type ){
 			case 'private_init_world':
@@ -109,47 +111,6 @@ const init = () => {
 
 
 
-
-
-
-
-const node_container = document.createElement('div')
-node_container.id = 'node-container'
-document.body.appendChild( node_container )
-
-const event_nodes = {}
-
-const logging_events = ['private_init_world']
-
-const refresh_events = packet => {
-	const { type } = packet
-	if( !event_nodes[ type ] ){
-		event_nodes[ type ] = build_event_node( type )
-		node_container.appendChild( event_nodes[ type ] )
-	}
-}
-
-
-const build_event_node = type => {
-
-	const node = document.createElement('div')
-	node.innerHTML = type
-	node.classList.add('event-node')
-	node.addEventListener('click', () => {
-		if( !logging_events.includes( type )){
-			logging_events.push( type )
-			node.classList.add('active')
-			hal('success', 'STARTED logging ' + type, 2000 )
-		}else{
-			logging_events.splice( logging_events.indexOf( type ), 1 )
-			node.classList.remove('active')
-			hal('success', 'STOPPED logging ' + type, 2000 )
-		}
-	})
-
-	return node
-
-}
 
 
 

@@ -273,10 +273,8 @@ body.index #content{
 	color: white;
 	z-index: 99;
 }
-#node-container div{
-	padding: 10px;
-	cursor: pointer;
-}
+
+
 
 #node-container{
 	border: 1px solid grey;
@@ -284,14 +282,24 @@ body.index #content{
 	max-height: 100vh;
 	overflow-y: auto;
 }
-
+#node-container h4{
+    text-align: center;
+}
 .event-node{
+	padding: 10px;
+	cursor: pointer;
 	color: grey;
+}
+.event-node input{
+	float: right;
+	margin-left: 10px;
 }
 .event-node.active{
 	color: orange;
 	font-weight: bold;
 }
+
+
 
 @keyframes link_pulse {
 	90% { opacity: .8 }
