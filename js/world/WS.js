@@ -1,27 +1,25 @@
-
 import env from '../env.js'
 import hal from '../utilities/hal.js'
 import Spinner from '../utilities/Spinner.js'
 import {
 	event_watch,
-	refresh_events,
 } from '../utilities/event_watch.js'
-
-
 import BROKER from '../utilities/EventBroker.js'
+
+
 
 const spinner = new Spinner({
 	src: '/resource/media/spinner.gif'
 })
 
-// if( env.HASHA && env.HASHA === env.HASHB ){ // usually ROUTER will be a global from another script....
-// 	window.ROUTER = packet => {
-// 		hal('packet', '<pre>' + JSON.stringify( packet, false, 2 ) + '</pre>', 500 )
-// 		// console.log('packet: ', packet )
-// 	}
-// }
 
-let bound = 0
+
+
+
+
+
+
+
 let packet, SOCKET 
 
 const init = () => {
@@ -63,18 +61,12 @@ const init = () => {
 			ROUTER( packet )
 		}
 
-		refresh_events( packet )
-
 		event_watch( packet )
 
 		switch( packet.type ){
 			case 'private_init_world':
 				window.PLAYER1 = packet.player1
 				// console.log( packet )
-				break;
-
-			case 'event_types':
-				refresh_events()
 				break;
 
 			case 'step':

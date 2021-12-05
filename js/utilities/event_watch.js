@@ -1,8 +1,6 @@
 import hal from './hal.js'
 
 
-
-
 const event_nodes = {}
 
 const logging_events = {}
@@ -10,10 +8,140 @@ const logging_events = {}
 
 
 
+const css = `
+#node-container{
+	position: fixed;
+	top: 0;
+	left: 0;
+	color: white;
+	z-index: 99;
+	border: 1px solid grey;
+	background: rgba(255, 255, 255, .1);
+	max-height: 100vh;
+	overflow-y: auto;
+	opacity: .4;
+}
+#node-container:hover{
+	opacity: 1;
+}
+#node-container h4{
+    text-align: center;
+}
+.event-node{
+	padding: 10px;
+	cursor: pointer;
+	color: grey;
+}
+.event-node input{
+	float: right;
+	margin-left: 10px;
+}
+.event-node.active{
+	color: orange;
+	font-weight: bold;
+}`
+const style = document.createElement('style')
+style.innerHTML = css
+document.head.appendChild( style )
+
+
+class EventNode {
+
+	constructor( init ){
+
+		init = init || {}
+
+		const en = this
+
+		// values
+		en.type = init.type
+		en.hal = init.hal
+		en.console = init.console
+
+		// DOM
+		en.ele = document.createElement('div')
+		en.ele.classList.add('event-node')
+		en.ele.setAttribute('data-type', en.type )
+
+		en.span = document.createElement('span')
+		en.span.innerHTML = en.type
+		en.span.title = 'toggle all logging for ' + en.type 
+		en.span.addEventListener('click', () => {
+			en.toggle()
+		})
+		en.ele.appendChild( en.span )
+
+		en.console_log = document.createElement('input')
+		en.console_log.type = 'checkbox'
+		en.console_log.title = 'log to console'
+		en.console_log.checked = en.console = init.console
+		en.console_log.addEventListener('change', e => {
+			en.console = en.console_log.checked
+			if( logging_events[ en.type ]){
+				hal('success', en.console_log.checked ? 'logging ' + en.type + ' to console' : 'stopped logging ' + en.type + ' to console')
+			}
+		})
+		en.ele.appendChild( en.console_log )
+
+		en.adjuster = document.createElement('input')
+		en.adjuster.type = 'range'
+		en.adjuster.title = 'duration of alerts'
+		en.adjuster.min = 0
+		en.adjuster.max = 50
+		en.adjuster.id = 'adjuster'
+		en.hal = en.adjuster.value = init.hal
+		en.adjuster.addEventListener('click', e => {
+			en.hal = en.adjuster.value
+			if( logging_events[ en.type ] ){
+				hal('success', 'duration for ' + en.type + ': ' + en.get_duration(), 2000 )
+			}
+		})
+		en.ele.appendChild( en.adjuster )
+
+		// init
+		event_nodes[ en.type ] = this
+
+		node_container.appendChild( en.ele )
+
+	}
+
+	get_duration(){
+		return ( this.hal / 5 ) * 1000
+	}
+
+	toggle(){
+		const state = logging_events[ this.type ]
+		if( state ){
+			delete logging_events[ this.type ]
+		}else{
+			logging_events[ this.type ] = true
+		}
+		hal('success', ( !state ? 'STARTED' : 'STOPPED' ) + ' logging ' + this.type, 2000  )
+		this.ele.classList.toggle('active')
+	}
+
+}
 
 
 
 
+
+
+// functions
+
+const touch_event = packet => {
+
+	const { type } = packet
+
+	if( !event_nodes[ type ] ){
+		const node = new EventNode({
+			type: type,
+			hal: 10,
+			console: false
+		})
+	}
+
+}
 
 
 
@@ -27,92 +155,6 @@ document.body.appendChild( node_container )
 
 
 
-// functions
-
-const refresh_events = packet => {
-	const { type } = packet
-	if( !event_nodes[ type ] ){
-		event_nodes[ type ] = build_event_node( type )
-		toggle_logging( event_nodes[ type ], false )
-		node_container.appendChild( event_nodes[ type ] )
-	}
-}
-
-
-const toggle_logging = ( node, state ) => {
-	const rawval = node.querySelector('input[type=range]').value
-	const type = node.getAttribute('data-type')
-
-	logging_events[ type ] = {
-		logging: state,
-		duration: ( rawval * 1000 ) / 5,
-		'console': node.querySelector('input[type=checkbox]').checked,
-	}
-
-	hal('success', ( state ? 'STARTED' : 'STOPPED' ) + ' logging ' + type, 2000 )
-	if( state ){
-		node.classList.add('active')
-	}else{
-		node.classList.remove('active')
-	}
-}
-
-
-
-
-
-const build_event_node = type => {
-
-	const node = document.createElement('div')
-	node.classList.add('event-node')
-	node.setAttribute('data-type', type )
-
-	const clickspan = document.createElement('span')
-	clickspan.innerHTML = type
-	clickspan.title = 'toggle all logging for ' + type 
-	clickspan.addEventListener('click', () => {
-		toggle_logging( node, !node.classList.contains('active') )
-	})
-	node.appendChild( clickspan )
-
-	let console_log = document.createElement('input')
-	console_log.type = 'checkbox'
-	console_log.title = 'log to console'
-	console_log.addEventListener('change', e => {
-		logging_events[ type ].console = console_log.checked
-		hal('success', console_log.checked ? 'logging ' + type + ' to console' : 'stopped logging ' + type + ' to console')
-	})
-	node.appendChild( console_log )
-
-	let adjuster = document.createElement('input')
-	adjuster.type = 'range'
-	adjuster.title = 'duration of alerts'
-	adjuster.min = 1
-	adjuster.max = 50
-	adjuster.id = 'adjuster'
-	adjuster.addEventListener('click', e => {
-		logging_events[ type ].hal = ( adjuster.value / 5 ) * 1000 
-	})
-	node.appendChild( adjuster )
-
-	logging_events[ type ] = {
-		logging: false,
-		hal: ( adjuster.value / 5 ) * 1000,
-		console: console_log.checked,
-	}
-
-	return node
-
-}
-
-
-// init
-event_nodes['private_init_world'] = build_event_node('private_init_world')
-node_container.appendChild( event_nodes['private_init_world'] )
-event_nodes['private_init_world'].querySelector('input[type=checkbox]').checked = true
-event_nodes['private_init_world'].querySelector('input[type=range]').value = 0
-
-toggle_logging( event_nodes['private_init_world'], true )
 
 
 
@@ -120,21 +162,25 @@ toggle_logging( event_nodes['private_init_world'], true )
 // export 
 
 const event_watch = packet => {
-	if( logging_events[ packet.type ] ){
-		// main switch
-		if( !logging_events[ packet.type ].logging ) return
-		// hal
-		if( logging_events[ packet.type ].hal ){ // ( can be 0 / off )
-			hal('packet', '<pre>' + JSON.stringify( packet, false, 2 ) + '</pre>', logging_events[ packet.type ].hal )
+
+	touch_event( packet )
+
+	if( !logging_events[ packet.type ] ) return 
+
+	// hal
+	if( event_nodes[ packet.type ].hal ){ // ( can be 0 / off )
+		const duration = event_nodes[ packet.type ].get_duration()
+		if( duration ){
+			hal('packet', '<pre>' + JSON.stringify( packet, false, 2 ) + '</pre>', duration )
 		}
-		// console
-		if( logging_events[ packet.type ].console ) console.log( packet )
 	}
+	// console
+	if( event_nodes[ packet.type ].console ) console.log( packet )
 
 }
 
 
 export {
 	event_watch,
-	refresh_events,
+	EventNode,
 }

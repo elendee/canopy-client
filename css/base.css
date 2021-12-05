@@ -266,38 +266,7 @@ body.index #content{
 	margin: 10px;
 }
 
-#node-container{
-	position: fixed;
-	top: 0;
-	left: 0;
-	color: white;
-	z-index: 99;
-}
 
-
-
-#node-container{
-	border: 1px solid grey;
-	background: rgba(255, 255, 255, .1);
-	max-height: 100vh;
-	overflow-y: auto;
-}
-#node-container h4{
-    text-align: center;
-}
-.event-node{
-	padding: 10px;
-	cursor: pointer;
-	color: grey;
-}
-.event-node input{
-	float: right;
-	margin-left: 10px;
-}
-.event-node.active{
-	color: orange;
-	font-weight: bold;
-}
 
 
 
